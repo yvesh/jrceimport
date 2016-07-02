@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension method="upgrade" type="component" version="3.5.0">
+    <name>jrceimport</name>
+    <author>Yves Hoppe - Compojoom.com</author>
+    <creationDate>##DATE##</creationDate>
+    <copyright>(C)  ##YEAR## compojoom.com</copyright>
+    <authorEmail>yves@compojoom.com</authorEmail>
+    <authorUrl>www.compojoom.com</authorUrl>
+    <version>##VERSION##</version>
+    <license>http://www.gnu.org/copyleft/gpl.html GNU/GPL</license>
+    <description><![CDATA[Importer for release content entries - Joomla 3.6 Marketing Team!]]></description>
+    <scriptfile>script.php</scriptfile>
+    <administration>
+        <menu img="../media/com_jrceimport/images/joomla-16px.png" view="cpanel">JRCE Import</menu>
+
+        <files folder="administrator/components/com_jrceimport">
+            ##BACKEND_COMPONENT_FILES##
+        </files>
+        <languages folder="administrator/language">
+            ##BACKEND_LANGUAGE_FILES##
+        </languages>
+    </administration>
+    <media destination="com_@@COMPONENTNAME@@" folder="media/com_jrceimport">
+        ##MEDIA_FILES##
+    </media>
+</extension>

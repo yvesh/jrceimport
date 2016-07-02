@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+    <fieldset name="basic">
+        <field  name="category"
+                type="category"
+                default="0"
+                extension="com_content"
+                label="Select a category"
+            />
+
+        <field name="language"
+               type="language"
+               client="site"
+               default="en-GB"
+               label="Select a language"
+               description=""
+        />
+
+        <field type="spacer" />
+
+        <field name="csv" type="file" required="true" />
+    </fieldset>
+</form>
