@@ -79,7 +79,7 @@ class JrceControllerImport extends JControllerLegacy
 			$article['created']    = JFactory::getDate()->toSql();
 			$article['modified']   = JFactory::getDate()->toSql();
 			$article['created_by'] = JFactory::getUser()->id;
-			$article['language']   = $input->getInt('jform[language]', 'en-GB');
+			$article['language']   = $input->get('jform[language]', 'en-GB');
 
 			$images = new stdClass;
 
