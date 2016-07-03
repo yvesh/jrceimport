@@ -58,6 +58,11 @@ class JrceControllerImport extends JControllerLegacy
 		/** @var  ContentModelArticle $articleModel */
 		$articleModel = JModelLegacy::getInstance('Article', 'ContentModel');
 
+		$jform = $input->get('jform', array(), 'ARRAY');
+
+		$catid = $jform['category'];
+		$lang  = $jform['language'];
+
 		foreach ($csv_array as $item)
 		{
 			$table = $articleModel->getTable();
@@ -70,7 +75,7 @@ class JrceControllerImport extends JControllerLegacy
 			}
 
 			$article['title']      = trim($item['Headline']);
-			$article['catid']      = $input->getInt('jform[category]', 1);
+			$article['catid']      = $catid;
 			$article['alias']      = JFilterOutput::stringURLSafe(trim($item['Headline']));
 
 			$article['introtext']  = '<p>' . nl2br(trim($item['introtext'])) . '</p>';
@@ -79,7 +84,7 @@ class JrceControllerImport extends JControllerLegacy
 			$article['created']    = JFactory::getDate()->toSql();
 			$article['modified']   = JFactory::getDate()->toSql();
 			$article['created_by'] = JFactory::getUser()->id;
-			$article['language']   = $input->get('jform[language]', 'en-GB');
+			$article['language']   = $lang;
 
 			$images = new stdClass;
 
