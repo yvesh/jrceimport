@@ -50,7 +50,7 @@ class JrceControllerImport extends JControllerLegacy
 		$enclosure = $input->get("csv_enclosure", '"', "string");
 		$escape = $input->get("csv_escape", '\\', "string");
 
-		$csv_array = $this->csv_to_array($file['tmp_name'], $delimiter, $enclosure, $escape);
+		$csv_array = $this->convertCsvToArray($file['tmp_name'], $delimiter, $enclosure, $escape);
 
 		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_content/models');
 		JTable::addIncludePath(JPATH_ROOT . '/libraries/legacy/table/content.php');
@@ -64,12 +64,17 @@ class JrceControllerImport extends JControllerLegacy
 
 			$article = array();
 
-			$article['title']      = $item['Headline'];
-			$article['catid']      = $input->getInt('jform[category]', 1);
-			$article['alias']      = JFilterOutput::stringURLSafe($item['Headline']);
+			if (!isset($item['Headline']) || empty($item['Headline']))
+			{
+				continue;
+			}
 
-			$article['introtext']  = '<p>' . nl2br($item['Copy']) . '</p>';
-			$article['fulltext']   = '<p>' . nl2br($item['Copy']) . '</p>';
+			$article['title']      = trim($item['Headline']);
+			$article['catid']      = $input->getInt('jform[category]', 1);
+			$article['alias']      = JFilterOutput::stringURLSafe(trim($item['Headline']));
+
+			$article['introtext']  = '<p>' . nl2br(trim($item['introtext'])) . '</p>';
+			$article['fulltext']   = '<p>' . nl2br(trim($item['fulltext'])) . '</p>';
 			$article['state']      = 1;
 			$article['created']    = JFactory::getDate()->toSql();
 			$article['modified']   = JFactory::getDate()->toSql();
@@ -78,48 +83,37 @@ class JrceControllerImport extends JControllerLegacy
 
 			$images = new stdClass;
 
-			/*
-			 * {"image_intro":"","float_intro":"","image_intro_alt":"","image_intro_caption":""
-			 * ,"image_fulltext":"","float_fulltext":"","image_fulltext_alt":"",
-			 * "image_fulltext_caption":""}
-			 */
-
-			$images->image_intro = $item['intro-img-path'];
-			$images->image_intro_alt = $item['intro-img-path-alt'];
-			$images->image_intro_caption = $item['intro-img-title'];
-			$images->image_fulltext = $item['full-img-path'];
-			$images->image_fulltext_alt = $item['full-img-alt'];
+			$images->image_intro            = $this->getImagePath($item['intro-img-path']);
+			$images->image_intro_alt        = $item['intro-img-path-alt'];
+			$images->image_intro_caption    = $item['intro-img-title'];
+			$images->image_fulltext         = $this->getImagePath($item['full-img-path']);
+			$images->image_fulltext_alt     = $item['full-img-alt'];
 			$images->image_fulltext_caption = $item['full-img-title'];
 
 			$article['images']  = json_encode($images);
 
-			/*
-			 * {"urla":false,"urlatext":"","targeta":"","urlb":false,"urlbtext":"",
-			 * "targetb":"","urlc":false,"urlctext":"","targetc":""}
-			 **/
-
 			$urls = new stdClass;
 
-			$urls->urla = $item['issues-link-A'];
+			$urls->urla     = $item['issues-link-A'];
 			$urls->urlatext = $item['Link-Title-A'];
-			$urls->targeta = $item['Link-target-A'];
-			$urls->urlb = $item['docs-joomla-org-link-B'];
+			$urls->targeta  = $item['Link-target-A'];
+			$urls->urlb     = $item['docs-joomla-org-link-B'];
 			$urls->urlbtext = $item['Link-Title-B'];
-			$urls->targetb = $item['Link-target-B'];
-			$urls->urlc = $item['more-link-C'];
+			$urls->targetb  = $item['Link-target-B'];
+			$urls->urlc     = $item['more-link-C'];
 			$urls->urlctext = $item['Link-Title-C'];
-			$urls->targetc = $item['Link-target-C'];
+			$urls->targetc  = $item['Link-target-C'];
 
-			$article['urls']  = json_encode($urls);
+			$article['urls'] = json_encode($urls);
+
+			$urls->metakey  = '';
+			$urls->metadesc = $item['metadescription'];
 
 			// Save the article with the data we created
 			// $articleModel->save($article);
-
 			$table->bind($article);
 
 			$table->store();
-
-			$table->checkIn();
 		}
 
 		$this->setRedirect('index.php?option=com_jrceimport', 'Import successfully finished');
@@ -134,7 +128,7 @@ class JrceControllerImport extends JControllerLegacy
 	 *
 	 * @return  array|bool
 	 */
-	private function csv_to_array($filename = '', $delimiter = ',', $enclosure = '"', $escape = "\\")
+	protected function convertCsvToArray($filename = '', $delimiter = ',', $enclosure = '"', $escape = "\\")
 	{
 		if (!file_exists($filename) || !is_readable($filename))
 		{
@@ -162,5 +156,24 @@ class JrceControllerImport extends JControllerLegacy
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Get the path (including images) of the image
+	 *
+	 * @param   string  $image  The image path
+	 *
+	 * @return  string
+	 */
+	protected function getImagePath($image)
+	{
+		$image = trim($image);
+
+		if (empty($image))
+		{
+			return '';
+		}
+
+		return 'images/' . $image;
 	}
 }
