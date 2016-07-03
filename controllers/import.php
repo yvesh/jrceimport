@@ -109,9 +109,26 @@ class JrceControllerImport extends JControllerLegacy
 			$urls->metakey  = '';
 			$urls->metadesc = $item['metadescription'];
 
+			$tags = explode(',', $item['tags']);
+
+			$article['tags']    = $tags;
+			$article['newTags'] = $tags;
+
 			// Save the article with the data we created
 			// $articleModel->save($article);
 			$table->bind($article);
+
+			$table->tags = $tags;
+			$table->newTags = $tags;
+
+			// Really, i dream of dead kittens now
+			foreach ($tags as $i => $tag)
+			{
+				$tags[$i] = '#new#' . $tag;
+			}
+
+			$table->tagsHelper = new JHelperTags();
+			$table->tagsHelper->createTagsFromField($tags);
 
 			$table->store();
 		}
