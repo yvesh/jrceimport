@@ -109,10 +109,10 @@ class JrceControllerImport extends JControllerLegacy
 			$urls->urlctext = $item['Link-Title-C'];
 			$urls->targetc  = $item['Link-target-C'];
 
-			$article['urls'] = json_encode($urls);
-
 			$urls->metakey  = '';
 			$urls->metadesc = $item['metadescription'];
+
+			$article['urls'] = json_encode($urls);
 
 			$tags = explode(',', $item['tags']);
 
