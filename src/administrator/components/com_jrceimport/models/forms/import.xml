@@ -6,7 +6,7 @@
                 default="0"
                 extension="com_content"
                 label="Select a category"
-            />
+        />
 
         <field name="language"
                type="language"
@@ -18,6 +18,6 @@
 
         <field type="spacer" />
 
-        <field name="csv" type="file" required="true" />
+        <field name="csv" type="file" required="true" label="CSV file" />
     </fieldset>
 </form>

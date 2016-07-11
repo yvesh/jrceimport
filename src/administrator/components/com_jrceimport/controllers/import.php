@@ -116,6 +116,12 @@ class JrceControllerImport extends JControllerLegacy
 
 			$tags = explode(',', $item['tags']);
 
+			// Remove white spaces
+			if (count($tags))
+			{
+				$tags = array_map('trim', $tags);
+			}
+
 			$article['tags']    = $tags;
 			$article['newTags'] = $tags;
 
@@ -138,7 +144,7 @@ class JrceControllerImport extends JControllerLegacy
 			$table->store();
 		}
 
-		$this->setRedirect('index.php?option=com_jrceimport', 'Import successfully finished');
+		$this->setRedirect('index.php?option=com_jrceimport', 'Import to category ' . $catid . ' and language ' . $lang . ' successfully finished!');
 	}
 
 
