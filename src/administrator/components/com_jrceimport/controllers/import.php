@@ -18,6 +18,15 @@ jimport('joomla.application.component.controllerform');
 class JrceControllerImport extends JControllerLegacy
 {
 	/**
+	 * The import lang
+	 *
+	 * @var    string
+	 *
+	 * @since  0.9.3
+	 */
+	protected $lang = '*';
+
+	/**
 	 * Import of the csv file
 	 *
 	 * @todo refactor, add error management and test data before
@@ -61,7 +70,7 @@ class JrceControllerImport extends JControllerLegacy
 		$jform = $input->get('jform', array(), 'ARRAY');
 
 		$catid = $jform['category'];
-		$lang  = $jform['language'];
+		$this->lang  = $jform['language'];
 
 		foreach ($csv_array as $item)
 		{
@@ -84,7 +93,7 @@ class JrceControllerImport extends JControllerLegacy
 			$article['created']    = JFactory::getDate()->toSql();
 			$article['modified']   = JFactory::getDate()->toSql();
 			$article['created_by'] = JFactory::getUser()->id;
-			$article['language']   = $lang;
+			$article['language']   = $this->lang;
 
 			$images = new stdClass;
 
@@ -139,7 +148,10 @@ class JrceControllerImport extends JControllerLegacy
 			}
 
 			$table->tagsHelper = new JHelperTags();
-			$table->tagsHelper->createTagsFromField($tags);
+			$ids = $table->tagsHelper->createTagsFromField($tags);
+
+			// Update tags language...
+			$this->updateTags($ids);
 
 			$table->store();
 		}
@@ -203,5 +215,36 @@ class JrceControllerImport extends JControllerLegacy
 		}
 
 		return 'images/' . $image;
+	}
+
+	/**
+	 * Update tags as createTagsFromField, does not really fit
+	 *
+	 * @param   array  $ids  The tag ids to update
+	 *
+	 * @return  bool
+	 *
+	 * @since   0.9.3
+	 */
+	protected function updateTags($ids)
+	{
+		if (!$ids && !count($ids))
+		{
+			return false;
+		}
+
+		JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
+		$tagTable = JTable::getInstance('Tag', 'TagsTable');
+
+		foreach ($ids as $id)
+		{
+			$tagTable->load($id);
+
+			$tagTable->language = $this->lang;
+
+			$tagTable->store();
+		}
+
+		return true;
 	}
 }
