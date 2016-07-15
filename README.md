@@ -7,7 +7,7 @@ articles.
 
 ### Installation
 
-Just install normally over the Joomla! installer.
+Install and update normally over the Joomla! installer. 
  
 ### Building
 
