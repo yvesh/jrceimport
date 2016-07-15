@@ -35,7 +35,7 @@ class JrceControllerImport extends JControllerLegacy
 	 *
 	 * @return  void
 	 *
-	 * @since   1.0.0
+	 * @since   0.9.0
 	 */
 	public function import()
 	{
@@ -71,6 +71,8 @@ class JrceControllerImport extends JControllerLegacy
 
 		$catid = $jform['category'];
 		$this->lang  = $jform['language'];
+
+		$ids = array();
 
 		foreach ($csv_array as $item)
 		{
@@ -131,6 +133,12 @@ class JrceControllerImport extends JControllerLegacy
 				$tags = array_map('trim', $tags);
 			}
 
+			// Add language - tags..
+			foreach ($tags as $i => $tag)
+			{
+				$tags[$i] = $tag . '-' . $this->lang;
+			}
+
 			$article['tags']    = $tags;
 			$article['newTags'] = $tags;
 
@@ -148,13 +156,12 @@ class JrceControllerImport extends JControllerLegacy
 			}
 
 			$table->tagsHelper = new JHelperTags();
-			$ids = $table->tagsHelper->createTagsFromField($tags);
-
-			// Update tags language...
-			$this->updateTags($ids);
+			$ids = array_merge($ids, $table->tagsHelper->createTagsFromField($tags));
 
 			$table->store();
 		}
+
+		$this->updateTags($ids);
 
 		$msg = 'Import to category ' . $catid . ' and language ' . $this->lang . ' successfully finished!';
 
@@ -169,6 +176,8 @@ class JrceControllerImport extends JControllerLegacy
 	 * @param   string  $delimiter  - The delimiter char
 	 *
 	 * @return  array|bool
+	 *
+	 * @since   0.9.0
 	 */
 	protected function convertCsvToArray($filename = '', $delimiter = ',', $enclosure = '"', $escape = "\\")
 	{
@@ -206,6 +215,8 @@ class JrceControllerImport extends JControllerLegacy
 	 * @param   string  $image  The image path
 	 *
 	 * @return  string
+	 *
+	 * @since   0.9.1
 	 */
 	protected function getImagePath($image)
 	{
@@ -242,7 +253,10 @@ class JrceControllerImport extends JControllerLegacy
 		{
 			$tagTable->load($id);
 
+			$tagTable->title = str_replace('-' . $this->lang, '', $tagTable->title);
 			$tagTable->language = $this->lang;
+			$tagTable->access = 1;
+			$tagTable->published = 1;
 
 			$tagTable->store();
 		}
