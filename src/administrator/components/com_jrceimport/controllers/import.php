@@ -156,7 +156,9 @@ class JrceControllerImport extends JControllerLegacy
 			$table->store();
 		}
 
-		$this->setRedirect('index.php?option=com_jrceimport', 'Import to category ' . $catid . ' and language ' . $lang . ' successfully finished!');
+		$msg = 'Import to category ' . $catid . ' and language ' . $this->lang . ' successfully finished!';
+
+		$this->setRedirect('index.php?option=com_jrceimport', $msg);
 	}
 
 
