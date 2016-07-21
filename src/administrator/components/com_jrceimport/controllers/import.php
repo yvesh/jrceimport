@@ -87,7 +87,15 @@ class JrceControllerImport extends JControllerLegacy
 
 			$article['title']      = trim($item['Headline']);
 			$article['catid']      = $catid;
-			$article['alias']      = JFilterOutput::stringURLSafe(trim($item['Headline']));
+
+			if (isset($item['alias']) && !empty($item['alias']))
+			{
+				$article['alias'] = trim($item['alias']);
+			}
+			else
+			{
+				$article['alias'] = JFilterOutput::stringURLSafe(trim($item['Headline']));
+			}
 
 			$article['introtext']  = '<p>' . nl2br(trim($item['introtext'])) . '</p>';
 			$article['fulltext']   = '<p>' . nl2br(trim($item['fulltext'])) . '</p>';
